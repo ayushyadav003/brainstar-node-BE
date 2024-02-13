@@ -32,8 +32,11 @@ const studentSchema = new student(
       unique: true,
     },
     batch: {
-      type: String,
-      unique: true,
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Batch",
+    },
+    fee: {
+      type: Number,
     },
   },
   {
@@ -41,4 +44,4 @@ const studentSchema = new student(
   }
 );
 
-export const UserModel = mongoose.model("student", studentSchema);
+export const UserModel = mongoose.model("Students", studentSchema);

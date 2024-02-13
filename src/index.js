@@ -3,6 +3,7 @@ import cors from "cors";
 import "dotenv/config";
 import dbConnect from "./utils/db/index.js";
 import userRoutes from "./routes/userRoutes.js";
+import authRouter from "./routes/authRoutes.js";
 
 const app = express();
 const PORT = process.env.PORT || 8000;
@@ -12,7 +13,7 @@ app.use(express.json());
 app.get("/", (req, res) => {
   res.send("Hello Welcome to API!");
 });
-app.use("/auth", userRoutes);
+app.use("/auth", authRouter);
 app.use("/user", userRoutes);
 
 dbConnect
