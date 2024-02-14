@@ -15,12 +15,10 @@ export const getAllStudents = asyncHandler(async (req, res) => {
 export const createNewUser = asyncHandler(async (req, res) => {
   const { fullName, email, phone, fee, batch, currentClass } = req.body;
 
-  //confirm data
   if (!fullName || !email || !batch || !currentClass) {
     return res.status(400).json({ message: "All fields must be provided." });
   }
 
-  //check for duplicate
   const duplicate = await Students.findOne({ email }).lean().exec();
 
   if (duplicate) {
@@ -32,7 +30,6 @@ export const createNewUser = asyncHandler(async (req, res) => {
   const hashedPassword = await bcrypt.hash(password, 10); //salt rounds
   const userObject = { fullName, password: hashedPassword, email, phone, role };
 
-  //create and store new user
   const user = await User.create(userObject);
 
   if (user) {
@@ -51,9 +48,8 @@ export const updateUser = asyncHandler(async (req, res) => {
   if (!user) {
     res.send(400).json({ message: "User not found." });
   }
-  //check for duplicate
   const duplicate = await User.findOne({ email }).lean().exec();
-  //allow update to the original user
+
   if (duplicate && duplicate.email.toString() !== email) {
     return res
       .status(400)

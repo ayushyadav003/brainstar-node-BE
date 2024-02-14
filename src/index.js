@@ -5,6 +5,7 @@ import dbConnect from "./utils/db/index.js";
 import userRoutes from "./routes/userRoutes.js";
 import authRouter from "./routes/authRoutes.js";
 import classRouter from "./routes/classRoutes.js";
+import batchRouter from "./routes/batchRoutes.js";
 
 const app = express();
 const PORT = process.env.PORT || 8000;
@@ -17,6 +18,7 @@ app.get("/", (req, res) => {
 app.use("/auth", authRouter);
 app.use("/user", userRoutes);
 app.use("/class", classRouter);
+app.use("/batch", batchRouter);
 
 dbConnect
   .then(() => {

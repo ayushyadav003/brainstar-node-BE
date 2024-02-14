@@ -2,18 +2,6 @@ import mongoose from "mongoose";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 
-const ACCESS_TOKEN = {
-  secret: process.env.AUTH_ACCESS_TOKEN_SECRET,
-  expiry: process.env.AUTH_ACCESS_TOKEN_EXPIRY,
-};
-const REFRESH_TOKEN = {
-  secret: process.env.AUTH_REFRESH_TOKEN_SECRET,
-  expiry: process.env.AUTH_REFRESH_TOKEN_EXPIRY,
-};
-const RESET_PASSWORD_TOKEN = {
-  expiry: process.env.RESET_PASSWORD_TOKEN_EXPIRY_MINS,
-};
-
 const student = mongoose.Schema;
 const studentSchema = new student(
   {
@@ -32,8 +20,8 @@ const studentSchema = new student(
       unique: true,
     },
     batch: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Batch",
+      type: [{ type: mongoose.Schema.Types.ObjectId, ref: "Batch" }],
+      require: [true, "Batch is required."],
     },
     fee: {
       type: Number,
@@ -44,4 +32,4 @@ const studentSchema = new student(
   }
 );
 
-export const UserModel = mongoose.model("Students", studentSchema);
+export const studentModel = mongoose.model("Students", studentSchema);
