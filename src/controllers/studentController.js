@@ -1,25 +1,36 @@
 import asyncHandler from "express-async-handler";
 import bcrypt from "bcrypt";
-import { Student, Students } from "../models/student.js";
+import { Student } from "../models/student.js";
+import { User } from "../models/User.js";
 
 // Get all students
 export const getAllStudents = asyncHandler(async (req, res) => {
-  const student = await Students.find().lean();
+  const student = await Student.find().lean();
   if (!student?.length) {
-    return res.status(400).json({ message: "Users not found." });
+    return res.status(400).json({ message: "Students not found." });
+  }
+  res.json(student);
+});
+
+// get student by ID
+export const getStudent = asyncHandler(async (req, res) => {
+  const { studentId } = req.params.id;
+  const student = await Student.findOne({ _id: studentId }).lean();
+  if (!student?.length) {
+    return res.status(400).json({ message: "Student not found." });
   }
   res.json(student);
 });
 
 // Create new student
-export const createNewUser = asyncHandler(async (req, res) => {
+export const craeteNewStudent = asyncHandler(async (req, res) => {
   const { fullName, email, phone, fee, batch, classes, role } = req.body;
 
   if (!fullName || !email || !batch || !classes || !fee) {
     return res.status(400).json({ message: "All fields must be provided." });
   }
 
-  const duplicate = await Students.findOne({ email }).lean().exec();
+  const duplicate = await Student.findOne({ email }).lean().exec();
 
   if (duplicate) {
     return res
@@ -27,7 +38,17 @@ export const createNewUser = asyncHandler(async (req, res) => {
       .json({ message: "Student with this email already exist." });
   }
 
+  const password = email.split(".com")[0] + "@123";
   const hashedPassword = await bcrypt.hash(password, 10); //salt rounds
+  const studentObject = {
+    fullName,
+    class: classes,
+    batches: batch,
+    email,
+    phone,
+    role,
+    fee,
+  };
   const userObject = {
     fullName,
     password: hashedPassword,
@@ -35,28 +56,29 @@ export const createNewUser = asyncHandler(async (req, res) => {
     email,
     phone,
     role,
-    fee,
   };
 
-  const student = await Student.create(userObject);
+  const user = await User.create(userObject);
+  const student = await Student.create(studentObject);
 
   if (student) {
-    res
-      .status(201)
-      .json({ message: "User created successfully.", data: student });
+    res.status(201).json({
+      message: "Student created successfully and password sent to their email.",
+      data: student,
+    });
   } else {
     res.status(400).json({ message: "Invalid user data receives." });
   }
 });
 
 // update student
-export const updateUser = asyncHandler(async (req, res) => {
-  const { fullName, email, newEmail, role, password } = req.body;
+export const updateStudent = asyncHandler(async (req, res) => {
+  const { fullName, email, role, password } = req.body;
 
-  const user = await User.findOne({ email }).exec();
+  const student = await Student.findOne({ email }).exec();
 
-  if (!user) {
-    res.send(400).json({ message: "User not found." });
+  if (!student) {
+    res.send(400).json({ message: "No student found with this email." });
   }
   const duplicate = await User.findOne({ email }).lean().exec();
 
@@ -66,15 +88,10 @@ export const updateUser = asyncHandler(async (req, res) => {
       .json({ message: "User already exist with this email." });
   }
 
-  user.fullName = fullName;
-  user.role = role;
-  user.email = newEmail;
+  student.fullname = fullName;
+  student.email = newEmail;
 
-  if (password) {
-    user.password = await bcrypt.hash(password, 10); //salt rounds
-  }
-
-  const upadtesUser = await user.save();
+  const upadtesUser = await student.save();
 
   res.json({ message: `${fullName} updates successfully.`, data: upadtesUser });
 });

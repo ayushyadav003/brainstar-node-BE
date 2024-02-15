@@ -5,7 +5,7 @@ import jwt from "jsonwebtoken";
 const student = mongoose.Schema;
 const studentSchema = new student(
   {
-    fullname: { type: String, required: [true, "Full name is required"] },
+    fullName: { type: String, required: [true, "Full name is required"] },
     email: {
       type: String,
       required: [true, "Email is required"],
@@ -19,8 +19,8 @@ const studentSchema = new student(
       type: String,
       unique: true,
     },
-    batch: {
-      type: [{ type: mongoose.Schema.Types.ObjectId, ref: "Batch" }],
+    batches: {
+      type: [String],
       require: [true, "Batch is required."],
     },
     fee: {
