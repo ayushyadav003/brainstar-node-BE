@@ -51,3 +51,19 @@ export const updateClass = asyncHandler(async (req, res) => {
     res.status(400).json({ message: "Invalid class data receives." });
   }
 });
+
+//delete class
+export const deleteClass = asyncHandler(async (req, res) => {
+  const { id } = req.body;
+
+  const classData = await Classes.findOne({ _id: id }).lean().exec();
+
+  if (!classData) {
+    res.status(400).json({ message: "Class not found." });
+  }
+
+  const result = await classData.deleteOne();
+
+  const reply = `${result.title} batch deleted successfully.`;
+  res.json(reply);
+});

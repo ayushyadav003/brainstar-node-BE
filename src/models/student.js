@@ -32,4 +32,4 @@ const studentSchema = new student(
   }
 );
 
-export const studentModel = mongoose.model("Students", studentSchema);
+export const Student = mongoose.model("Students", studentSchema);

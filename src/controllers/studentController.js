@@ -1,21 +1,21 @@
 import asyncHandler from "express-async-handler";
 import bcrypt from "bcrypt";
-import { Students } from "../models/student.js";
+import { Student, Students } from "../models/student.js";
 
-// Get all users
+// Get all students
 export const getAllStudents = asyncHandler(async (req, res) => {
-  const users = await Students.find().select("-password").lean();
-  if (!users?.length) {
+  const student = await Students.find().lean();
+  if (!student?.length) {
     return res.status(400).json({ message: "Users not found." });
   }
-  res.json(users);
+  res.json(student);
 });
 
-// Create new user
+// Create new student
 export const createNewUser = asyncHandler(async (req, res) => {
-  const { fullName, email, phone, fee, batch, currentClass } = req.body;
+  const { fullName, email, phone, fee, batch, classes, role } = req.body;
 
-  if (!fullName || !email || !batch || !currentClass) {
+  if (!fullName || !email || !batch || !classes || !fee) {
     return res.status(400).json({ message: "All fields must be provided." });
   }
 
@@ -24,22 +24,32 @@ export const createNewUser = asyncHandler(async (req, res) => {
   if (duplicate) {
     return res
       .status(409)
-      .json({ message: "User with this email already exist." });
+      .json({ message: "Student with this email already exist." });
   }
 
   const hashedPassword = await bcrypt.hash(password, 10); //salt rounds
-  const userObject = { fullName, password: hashedPassword, email, phone, role };
+  const userObject = {
+    fullName,
+    password: hashedPassword,
+    batches: batch,
+    email,
+    phone,
+    role,
+    fee,
+  };
 
-  const user = await User.create(userObject);
+  const student = await Student.create(userObject);
 
-  if (user) {
-    res.status(201).json({ message: "User created successfully.", data: user });
+  if (student) {
+    res
+      .status(201)
+      .json({ message: "User created successfully.", data: student });
   } else {
     res.status(400).json({ message: "Invalid user data receives." });
   }
 });
 
-// update user
+// update student
 export const updateUser = asyncHandler(async (req, res) => {
   const { fullName, email, newEmail, role, password } = req.body;
 
@@ -69,10 +79,10 @@ export const updateUser = asyncHandler(async (req, res) => {
   res.json({ message: `${fullName} updates successfully.`, data: upadtesUser });
 });
 
-// delete user
+// delete student
 export const deleteUser = asyncHandler(async (req, res) => {
   const { email } = req.body;
-  const user = await User.findOne({ email }).lean().exec();
+  const user = await Student.findOne({ email }).lean().exec();
 
   if (!user) {
     res.status(400).json({ message: "User not found." });
