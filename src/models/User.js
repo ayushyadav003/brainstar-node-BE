@@ -22,6 +22,10 @@ const UserSchema = new user({
     required: [true, "Email is required"],
     unique: true,
   },
+  instituteName: {
+    type: String,
+    required: true,
+  },
   password: {
     type: String,
     required: true,

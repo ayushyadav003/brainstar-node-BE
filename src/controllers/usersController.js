@@ -2,21 +2,12 @@ import asyncHandler from "express-async-handler";
 import bcrypt from "bcrypt";
 import { User } from "../models/User.js";
 
-// Get all users
-export const getAllUsers = asyncHandler(async (req, res) => {
-  const users = await User.find().select("-password").lean();
-  if (!users?.length) {
-    return res.status(400).json({ message: "Users not found." });
-  }
-  res.json(users);
-});
-
 // Create new user
 export const createNewUser = asyncHandler(async (req, res) => {
-  const { fullName, password, email, phone, role } = req.body;
+  const { fullName, instituteName, password, email, phone, role } = req.body;
 
   //confirm data
-  if (!fullName || !password || !email || !role) {
+  if (!fullName || !instituteName || !password || !email || !role) {
     return res.status(400).json({ message: "All fields must be provided." });
   }
 
@@ -30,7 +21,14 @@ export const createNewUser = asyncHandler(async (req, res) => {
   }
 
   const hashedPassword = await bcrypt.hash(password, 10); //salt rounds
-  const userObject = { fullName, password: hashedPassword, email, phone, role };
+  const userObject = {
+    fullName,
+    password: hashedPassword,
+    institute: instituteName,
+    email,
+    phone,
+    role,
+  };
 
   //create and store new user
   const user = await User.create(userObject);
