@@ -18,7 +18,7 @@ app.get("/api/v1/", (req, res) => {
   res.send("Hello Welcome to API!");
 });
 app.use("/api/v1/auth", authRouter);
-app.use("/api/v1/user", userRoutes);
+app.use("/api/v1/register", userRoutes);
 app.use("/api/v1/class", classRouter);
 app.use("/api/v1/batch", batchRouter);
 app.use("/api/v1/students", studentRouter);

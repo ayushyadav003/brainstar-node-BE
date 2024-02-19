@@ -39,7 +39,7 @@ export const craeteNewStudent = asyncHandler(async (req, res) => {
   }
 
   const password = email.split(".com")[0] + "@123";
-  const hashedPassword = await bcrypt.hash(password, 10); //salt rounds
+  const hashedPassword = await bcrypt.hash(email.slice(0, 4) + "@" + 325, 10); //salt rounds
   const studentObject = {
     fullName,
     class: classes,
@@ -48,17 +48,9 @@ export const craeteNewStudent = asyncHandler(async (req, res) => {
     phone,
     role,
     fee,
-  };
-  const userObject = {
-    fullName,
     password: hashedPassword,
-    batches: batch,
-    email,
-    phone,
-    role,
   };
 
-  const user = await User.create(userObject);
   const student = await Student.create(studentObject);
 
   if (student) {

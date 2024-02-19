@@ -26,6 +26,10 @@ const studentSchema = new student(
     fee: {
       type: Number,
     },
+    password: {
+      type: String,
+      require: true,
+    },
   },
   {
     timestamps: true,
