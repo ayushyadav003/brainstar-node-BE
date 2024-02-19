@@ -4,25 +4,28 @@ import { User } from "../models/User.js";
 
 // Create new user
 export const createNewUser = asyncHandler(async (req, res) => {
-  const { fullName, instituteName, password, email, phone, role } = req.body;
+  const { ownerName, instituteName, password, email, phone, role } = req.body;
 
   //confirm data
-  if (!fullName || !instituteName || !password || !email || !role) {
-    return res.status(400).json({ message: "All fields must be provided." });
+  if (!ownerName || !instituteName || !password || !email || !role) {
+    return res
+      .status(200)
+      .json({ statusCode: 400, message: "All fields must be provided." });
   }
 
   //check for duplicate
   const duplicate = await User.findOne({ email }).lean().exec();
 
   if (duplicate) {
-    return res
-      .status(409)
-      .json({ message: "User with this email already exist." });
+    return res.status(200).json({
+      statusCode: 409,
+      message: "User with this email already exist.",
+    });
   }
 
   const hashedPassword = await bcrypt.hash(password, 10); //salt rounds
   const userObject = {
-    fullName,
+    ownerName,
     password: hashedPassword,
     institute: instituteName,
     email,
@@ -32,11 +35,18 @@ export const createNewUser = asyncHandler(async (req, res) => {
 
   //create and store new user
   const user = await User.create(userObject);
-
   if (user) {
-    res.status(201).json({ message: "User created successfully.", data: user });
+    delete user.password;
+    delete user._V;
+    res.status(200).json({
+      statusCode: 201,
+      message: "User created successfully.",
+      data: user,
+    });
   } else {
-    res.status(400).json({ message: "Invalid user data receives." });
+    res
+      .status(200)
+      .json({ statusCode: 400, message: "Invalid user data receives." });
   }
 });
 

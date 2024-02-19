@@ -16,13 +16,13 @@ const RESET_PASSWORD_TOKEN = {
 
 const user = mongoose.Schema;
 const UserSchema = new user({
-  fullName: { type: String, required: [true, "Full name is required"] },
+  ownerName: { type: String, required: [true, "Owner name is required"] },
   email: {
     type: String,
     required: [true, "Email is required"],
     unique: true,
   },
-  instituteName: {
+  institute: {
     type: String,
     required: true,
   },
