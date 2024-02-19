@@ -17,17 +17,11 @@ export const login = asyncHandler(async (req, res) => {
   var foundUser;
 
   switch (role) {
-    case "Admin":
-      foundUser = await User.findOne({ email }).exec();
-      break;
-    case "Teacher":
-      // foundUser = await Teacher.findOne({ email }).exec();
-      break;
     case "Student":
       foundUser = await Student.findOne({ email }).exec();
       break;
-
     default:
+      foundUser = await User.findOne({ email }).exec();
       break;
   }
 
@@ -64,11 +58,10 @@ export const login = asyncHandler(async (req, res) => {
   //   { expireIn: "1d" }
   // );
 
-  const user = delete foundUser.password;
-
+  delete foundUser.password;
   return res.status(200).json({
     statusCode: 200,
     message: "Login successful",
-    data: { user },
+    data: { foundUser },
   });
 });
