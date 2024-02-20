@@ -3,6 +3,7 @@ import bcrypt from "bcrypt";
 import { User } from "../models/User.js";
 import Jwt from "jsonwebtoken";
 import { Student } from "../models/student.js";
+import { Teacher } from "../models/teacher.js";
 
 // POST /auth
 // public
@@ -22,6 +23,9 @@ export const login = asyncHandler(async (req, res) => {
       break;
     default:
       foundUser = await User.findOne({ email }).exec();
+      if (!foundUser) {
+        foundUser = await Teacher.findOne({ email }).exec();
+      }
       break;
   }
 

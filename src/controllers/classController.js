@@ -3,17 +3,44 @@ import { Classes } from "../models/class.js";
 
 // get all classes
 export const getAllClasses = asyncHandler(async (req, res) => {
-  const { institute } = req.body;
+  const { institute, title } = req.query;
   if (!institute) {
-    return res.status(400).json({ message: "Institute is required." });
+    return res
+      .status(200)
+      .json({ statusCode: 400, message: "Institute is required." });
   }
 
-  const classes = await Classes.find({ institute: institute }).select().lean();
+  const classes = await Classes.aggregate([
+    {
+      $match: { institute: institute },
+    },
+    {
+      $lookup: {
+        from: "student",
+        localField: "_id",
+        foreignField: "class",
+        as: "students",
+      },
+    },
+    {
+      $project: {
+        _id: 1,
+        title: 1,
+        totalStudents: { $size: "$students" }, // Count the number of students
+      },
+    },
+  ]);
+
+  // const classes = await Classes.find({ institute: institute })
+  //   .select("-__V")
+  //   .lean();
 
   if (!classes?.length) {
-    return res.status(400).json({ message: "No classes found." });
+    return res
+      .status(400)
+      .json({ statusCode: 400, message: "No classes found." });
   }
-  res.json(classes);
+  res.status(200).json({ statusCode: 200, classes });
 });
 
 // create class
@@ -21,7 +48,9 @@ export const createClass = asyncHandler(async (req, res) => {
   const { institute, title } = req.body;
 
   if (!institute || !title) {
-    return res.status(400).json({ message: "All fields are required." });
+    return res
+      .status(400)
+      .json({ statusCode: 400, message: "All fields are required." });
   }
 
   const classObject = { institute, title };
@@ -29,7 +58,9 @@ export const createClass = asyncHandler(async (req, res) => {
   const newClass = await Classes.create(classObject);
 
   if (newClass) {
-    return res.status(200).json({ message: "Class created successfully!" });
+    return res
+      .status(201)
+      .json({ statusCode: 201, message: "Class created successfully!" });
   } else {
     res.status(400).json({ message: "Invalid class data receives." });
   }
