@@ -38,7 +38,6 @@ export const craeteNewStudent = asyncHandler(async (req, res) => {
       .json({ message: "Student with this email already exist." });
   }
 
-  const password = email.split(".com")[0] + "@123";
   const hashedPassword = await bcrypt.hash(email.slice(0, 4) + "@" + 325, 10); //salt rounds
   const studentObject = {
     fullName,
@@ -46,7 +45,7 @@ export const craeteNewStudent = asyncHandler(async (req, res) => {
     batches: batch,
     email,
     phone,
-    role,
+    role: "Student",
     fee,
     password: hashedPassword,
   };
@@ -55,11 +54,14 @@ export const craeteNewStudent = asyncHandler(async (req, res) => {
 
   if (student) {
     res.status(201).json({
+      statusCode: 201,
       message: "Student created successfully and password sent to their email.",
       data: student,
     });
   } else {
-    res.status(400).json({ message: "Invalid user data receives." });
+    res
+      .status(400)
+      .json({ statusCode: 400, message: "Invalid user data receives." });
   }
 });
 
