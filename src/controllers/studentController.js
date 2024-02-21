@@ -7,7 +7,7 @@ import { User } from "../models/User.js";
 export const getAllStudents = asyncHandler(async (req, res) => {
   const student = await Student.find().lean();
   if (!student?.length) {
-    return res.status(400).json({ message: "Students not found." });
+    return res.status(400).json({ message: "No student found." });
   }
   res.json(student);
 });
@@ -24,9 +24,9 @@ export const getStudent = asyncHandler(async (req, res) => {
 
 // Create new student
 export const craeteNewStudent = asyncHandler(async (req, res) => {
-  const { fullName, email, phone, fee, batch, classes, role } = req.body;
+  const { fullName, email, phone, fee, batches, classes, role } = req.body;
 
-  if (!fullName || !email || !batch || !classes || !fee) {
+  if (!fullName || !email || !batches || !classes || !fee) {
     return res.status(400).json({ message: "All fields must be provided." });
   }
 
@@ -42,7 +42,7 @@ export const craeteNewStudent = asyncHandler(async (req, res) => {
   const studentObject = {
     fullName,
     class: classes,
-    batches: batch,
+    batches,
     email,
     phone,
     role: "Student",
