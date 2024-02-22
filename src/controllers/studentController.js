@@ -9,24 +9,27 @@ export const getAllStudents = asyncHandler(async (req, res) => {
   if (!student?.length) {
     return res.status(400).json({ message: "No student found." });
   }
-  res.json(student);
+  res.status(200).json({ statusCode: 200, student });
 });
 
 // get student by ID
 export const getStudent = asyncHandler(async (req, res) => {
   const { studentId } = req.params.id;
-  const student = await Student.findOne({ _id: studentId }).lean();
+  const student = await Student.findOne({ _id: studentId })
+    .select("-password")
+    .lean();
   if (!student?.length) {
     return res.status(400).json({ message: "Student not found." });
   }
-  res.json(student);
+
+  res.status(200).json({ statusCode: 200, student });
 });
 
 // Create new student
 export const craeteNewStudent = asyncHandler(async (req, res) => {
-  const { fullName, email, phone, fee, batches, classes, role } = req.body;
+  const { fullName, email, phone, fee, batches, classId } = req.body;
 
-  if (!fullName || !email || !batches || !classes || !fee) {
+  if (!fullName || !email || !batches || !classId || !fee) {
     return res.status(400).json({ message: "All fields must be provided." });
   }
 
@@ -41,7 +44,7 @@ export const craeteNewStudent = asyncHandler(async (req, res) => {
   const hashedPassword = await bcrypt.hash(email.slice(0, 4) + "@" + 325, 10); //salt rounds
   const studentObject = {
     fullName,
-    class: classes,
+    class: classId,
     batches,
     email,
     phone,
