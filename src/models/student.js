@@ -3,6 +3,11 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 
 const student = mongoose.Schema;
+const attendanceSchema = mongoose.Schema({
+  date: { type: Date },
+  day: { type: String },
+  status: { type: String },
+});
 const studentSchema = new student(
   {
     fullName: { type: String, required: [true, "Full name is required"] },
@@ -25,6 +30,9 @@ const studentSchema = new student(
     },
     fee: {
       type: Number,
+    },
+    attendance: {
+      type: [attendanceSchema],
     },
     password: {
       type: String,
