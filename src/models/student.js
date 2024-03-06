@@ -15,14 +15,16 @@ const studentSchema = new student(
       type: Number,
       unique: true,
     },
-    class: {
-      type: String,
-      unique: true,
+    classes: {
+      id: { type: String, required: true },
+      title: { type: String, required: true },
     },
-    batches: {
-      type: [String],
-      require: [true, "Batch is required."],
-    },
+    batches: [
+      {
+        id: { type: String, required: true },
+        title: { type: String, required: true },
+      },
+    ],
     fee: {
       type: Number,
     },
@@ -30,6 +32,7 @@ const studentSchema = new student(
       type: String,
       require: true,
     },
+    institute: { type: String, require: true },
   },
   {
     timestamps: true,

@@ -5,10 +5,12 @@ import { User } from "../models/User.js";
 
 // Get all students
 export const getAllStudents = asyncHandler(async (req, res) => {
-  const student = await Student.find().lean();
+  const { institute } = req.query;
+  const student = await Student.find({ institute }).select("-password").lean();
   if (!student?.length) {
     return res.status(400).json({ message: "No student found." });
   }
+
   res.status(200).json({ statusCode: 200, student });
 });
 
@@ -27,7 +29,7 @@ export const getStudent = asyncHandler(async (req, res) => {
 
 // Create new student
 export const craeteNewStudent = asyncHandler(async (req, res) => {
-  const { fullName, email, phone, fee, batches, classId } = req.body;
+  const { fullName, email, phone, fee, batches, classId, institute } = req.body;
 
   if (!fullName || !email || !batches || !classId || !fee) {
     return res.status(400).json({ message: "All fields must be provided." });
@@ -44,12 +46,13 @@ export const craeteNewStudent = asyncHandler(async (req, res) => {
   const hashedPassword = await bcrypt.hash(email.slice(0, 4) + "@" + 325, 10); //salt rounds
   const studentObject = {
     fullName,
-    class: classId,
+    classes: classId,
     batches,
     email,
     phone,
     role: "Student",
     fee,
+    institute,
     password: hashedPassword,
   };
 
