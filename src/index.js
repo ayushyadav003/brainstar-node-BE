@@ -22,7 +22,6 @@ app.use("/api/v1/register", userRoutes);
 app.use("/api/v1/class", classRouter);
 app.use("/api/v1/batch", batchRouter);
 app.use("/api/v1/students", studentRouter);
-
 dbConnect
   .then(() => {
     console.log("---Database is connected---");
