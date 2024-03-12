@@ -5,8 +5,17 @@ import { User } from "../models/User.js";
 
 // Get all students
 export const getAllStudents = asyncHandler(async (req, res) => {
-  const { institute } = req.query;
-  const student = await Student.find({ institute }).select("-password").lean();
+  const { institute, classId, batchId } = req.query;
+  let query = { institute };
+
+  if (classId) {
+    query["classes.id"] = classId;
+  }
+
+  if (batchId) {
+    query["batches.id"] = batchId;
+  }
+  const student = await Student.find(query).select("-password").lean();
   if (!student?.length) {
     return res.status(400).json({ message: "No student found." });
   }
@@ -88,12 +97,47 @@ export const updateStudent = asyncHandler(async (req, res) => {
       .json({ message: "User already exist with this email." });
   }
 
-  student.fullname = fullName;
+  student.fullName = fullName;
   student.email = newEmail;
 
   const upadtesUser = await student.save();
 
   res.json({ message: `${fullName} updates successfully.`, data: upadtesUser });
+});
+
+//update attendance
+export const updateAttendance = asyncHandler(async (req, res) => {
+  const { studenId, date, batch } = req.body;
+
+  let student = await Student.findOne({ _id: studenId }).exec();
+
+  if (!student) {
+    res.status(400).json({ message: "No student" });
+  }
+  const existingAttendance = student?.attendance?.find(
+    (item) => item.date === date
+  );
+
+  if (existingAttendance) {
+    const existingBatch = existingAttendance?.batch?.find(
+      (item) => item.batchId === batch.batchId
+    );
+
+    if (existingBatch) {
+      existingBatch.status = batch.status;
+    } else {
+      batch.push({ batchId: batch.batchId, status: batch.status });
+    }
+  } else {
+    student.attendance.push({
+      date,
+      batch: [{ batchId: batch.batchId, status: batch.status }],
+    });
+  }
+
+  await student.save();
+
+  res.json({ message: `Attendance updates successfully.` });
 });
 
 // delete student
