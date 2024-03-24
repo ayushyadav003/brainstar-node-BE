@@ -11,6 +11,9 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@google-apps/meet": "^0.1.1",
+    "@google-cloud/local-auth": "^2.1.0",
+    "axios": "^1.6.8",
     "bcrypt": "^5.1.1",
     "bcryptjs": "^2.4.3",
     "cookie-parser": "^1.4.6",
@@ -20,11 +23,14 @@
     "express-async-handler": "^1.2.0",
     "express-rate-limit": "^7.1.5",
     "express-validator": "^7.0.1",
+    "google-auth-library": "^9.7.0",
     "googleapis": "^133.0.0",
     "jsonwebtoken": "^9.0.2",
+    "jsrsasign": "^11.1.0",
     "mongoose": "^8.0.3",
     "nodemailer": "^6.9.7",
-    "uuid": "^9.0.1"
+    "uuid": "^9.0.1",
+    "zoomus": "^0.1.4"
   },
   "devDependencies": {
     "dotenv": "^16.3.1",

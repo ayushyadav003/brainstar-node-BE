@@ -8,6 +8,7 @@ import classRouter from "./routes/classRoutes.js";
 import batchRouter from "./routes/batchRoutes.js";
 import studentRouter from "./routes/studentsRoutes.js";
 import swaggerDocs from "./swagger.js";
+import meetingRouter from "./routes/meetingRoutes.js";
 
 const app = express();
 const PORT = process.env.PORT || 8000;
@@ -22,6 +23,7 @@ app.use("/api/v1/register", userRoutes);
 app.use("/api/v1/class", classRouter);
 app.use("/api/v1/batch", batchRouter);
 app.use("/api/v1/students", studentRouter);
+app.use("/api/v1/meetings", meetingRouter);
 dbConnect
   .then(() => {
     console.log("---Database is connected---");
