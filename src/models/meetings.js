@@ -9,18 +9,19 @@ const meetingSchema = new meetings(
     description: { type: "string" },
     join_url: { type: "string", required: [true, "Join url is required"] },
     start_url: { type: "string", required: [true, "Start url is required"] },
-    instituteid: {
+    instituteId: {
       type: "string",
       required: [true, "Class title is required"],
     },
     duration: { type: "string", required: [true, "Duration is required"] },
     startTime: { type: "string", required: [true, "Start time is required"] },
-    classId: { type: "string", required: [true, "Class Id is required"] },
+    instituteId: { type: "string", required: [true, "Class Id is required"] },
     batchId: { type: "string", required: [true, "Batch Id is required"] },
+    teacherId: { type: "string" },
   },
   {
     timestamps: true,
   }
 );
 
-export const meeting = mongoose.model("Meetings", meetingSchema);
+export const Meeting = mongoose.model("Meetings", meetingSchema);
