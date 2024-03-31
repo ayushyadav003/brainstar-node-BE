@@ -38,9 +38,18 @@ export const getStudent = asyncHandler(async (req, res) => {
 
 // Create new student
 export const craeteNewStudent = asyncHandler(async (req, res) => {
-  const { fullName, email, phone, fee, batches, classId, institute } = req.body;
+  const {
+    fullName,
+    email,
+    phone,
+    fee,
+    batches,
+    classes,
+    institute,
+    teacherId,
+  } = req.body;
 
-  if (!fullName || !email || !batches || !classId || !fee) {
+  if (!fullName || !email || !batches || !classes || !fee || !teacherId) {
     return res.status(400).json({ message: "All fields must be provided." });
   }
 
@@ -55,13 +64,14 @@ export const craeteNewStudent = asyncHandler(async (req, res) => {
   const hashedPassword = await bcrypt.hash(email.slice(0, 4) + "@" + 325, 10); //salt rounds
   const studentObject = {
     fullName,
-    classes: classId,
+    classes,
     batches,
     email,
     phone,
     role: "Student",
     fee,
     institute,
+    teacherId,
     password: hashedPassword,
   };
 
@@ -141,16 +151,23 @@ export const updateAttendance = asyncHandler(async (req, res) => {
 });
 
 // delete student
-export const deleteUser = asyncHandler(async (req, res) => {
-  const { email } = req.body;
-  const user = await Student.findOne({ email }).lean().exec();
+export const deleteStudent = asyncHandler(async (req, res) => {
+  const { studentId } = req.body;
+
+  const user = await Student.findOne({ _id: studentId }).lean().exec();
 
   if (!user) {
     res.status(400).json({ message: "User not found." });
   }
 
-  const result = await User.deleteOne();
+  const result = await Student.deleteOne();
 
-  const reply = `${result.fullName} with email ${result.email} deleted successfully.`;
-  res.json(reply);
+  const reply = `${result.fullName} deleted successfully.`;
+
+  console.log(reply);
+
+  res.status(200).json({
+    statusCode: 200,
+    message: reply,
+  });
 });

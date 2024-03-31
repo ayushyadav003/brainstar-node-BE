@@ -1,6 +1,7 @@
 import express from "express";
 import {
   craeteNewStudent,
+  deleteStudent,
   getAllStudents,
   getStudent,
   updateAttendance,
@@ -13,7 +14,7 @@ studentRouter
   .get(getAllStudents)
   .post(craeteNewStudent)
   .put()
-  .delete();
+  .delete(deleteStudent);
 
 studentRouter.route("/attendance").post(updateAttendance);
 export default studentRouter;

@@ -15,6 +15,11 @@ const studentSchema = new student(
       type: Number,
       unique: true,
     },
+    teacherId: {
+      type: String,
+      required: true,
+      // title: { type: String, required: true },
+    },
     classes: {
       id: { type: String, required: true },
       title: { type: String, required: true },
@@ -34,6 +39,7 @@ const studentSchema = new student(
         batch: [{ batchId: String, status: String }],
       },
     ],
+
     password: {
       type: String,
       require: true,
