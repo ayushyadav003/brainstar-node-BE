@@ -15,7 +15,7 @@ export const getAllTeachers = asyncHandler(async (req, res) => {
   if (batchId) {
     query["batches.id"] = batchId;
   }
-  const student = await Student.find(query).select("-password").lean();
+  const student = await Student.find(query).lean();
   if (!student?.length) {
     return res.status(400).json({ message: "No student found." });
   }
@@ -37,17 +37,8 @@ export const getStudent = asyncHandler(async (req, res) => {
 });
 
 // Create new student
-export const craeteNewStudent = asyncHandler(async (req, res) => {
-  const {
-    fullName,
-    email,
-    phone,
-    fee,
-    batches,
-    classes,
-    institute,
-    teacherId,
-  } = req.body;
+export const craeteNewTeacher = asyncHandler(async (req, res) => {
+  const { fullName, email, phone, batches, classes, institute } = req.body;
 
   if (!fullName || !email || !batches || !classes || !fee || !teacherId) {
     return res.status(400).json({ message: "All fields must be provided." });
