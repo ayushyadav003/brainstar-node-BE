@@ -3,7 +3,7 @@ import { Classes } from "../models/class.js";
 
 // get all classes
 export const getAllClasses = asyncHandler(async (req, res) => {
-  const { institute, title } = req.query;
+  const { institute, title, teacherId } = req.query;
   if (!institute) {
     return res
       .status(200)
@@ -45,7 +45,7 @@ export const getAllClasses = asyncHandler(async (req, res) => {
 
 // create class
 export const createClass = asyncHandler(async (req, res) => {
-  const { institute, title } = req.body;
+  const { institute, title, teacherId } = req.body;
 
   if (!institute || !title) {
     return res
@@ -53,7 +53,7 @@ export const createClass = asyncHandler(async (req, res) => {
       .json({ statusCode: 400, message: "All fields are required." });
   }
 
-  const classObject = { institute, title };
+  const classObject = { institute, title, teacherId: [teacherId] };
 
   const newClass = await Classes.create(classObject);
 

@@ -58,7 +58,7 @@ export const createBatch = asyncHandler(async (req, res) => {
     });
   }
 
-  const batchObject = { title, class: classId, institute };
+  const batchObject = { title, class: classId, institute, fees };
   const batch = await Batch.create(batchObject);
 
   if (!batch) {

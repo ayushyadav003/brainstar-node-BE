@@ -7,6 +7,7 @@ const batchesSchema = new batches(
     title: { type: "string", required: [true, "Bathc title is required"] },
     class: { type: "string", required: [true, "Class is required"] },
     institute: { type: "string", required: [true, "Class title is required"] },
+    fees: { type: "string",  },
   },
   {
     timestamps: true,
