@@ -2,12 +2,47 @@ import asyncHandler from "express-async-handler";
 import bcrypt from "bcrypt";
 import { User } from "../models/User.js";
 
+// get all user
+export const getAllUsers = asyncHandler(async (req, res) => {
+  const { instituteId, userId, role } = req.body;
+
+  //confirm data
+  if (!instituteId) {
+    return res
+      .status(400)
+      .json({ statusCode: 400, message: "InstituteId be provided." });
+  }
+
+  let query = {
+    institute: instituteId,
+    role,
+  };
+
+  if (userId) {
+    query.userId = userId;
+  }
+
+  const users = await User.find(query).select("-password -__v").lean();
+
+  if (users) {
+    res.status(200).json({
+      statusCode: 201,
+      message: "User created successfully.",
+      data: users,
+    });
+  } else {
+    res
+      .status(400)
+      .json({ statusCode: 400, message: "Invalid user data receives." });
+  }
+});
+
 // Create new user
 export const createNewUser = asyncHandler(async (req, res) => {
   const { ownerName, instituteName, password, email, phone, role } = req.body;
 
   //confirm data
-  if (!ownerName || !instituteName || !password || !email || !role) {
+  if (!ownerName || !instituteName || !email || !role) {
     return res
       .status(200)
       .json({ statusCode: 400, message: "All fields must be provided." });
@@ -19,13 +54,22 @@ export const createNewUser = asyncHandler(async (req, res) => {
   if (duplicate) {
     return res.status(200).json({
       statusCode: 409,
-      message: "User with this email already exist.",
+      message: `${
+        role === "teacher" ? "Teacher" : "User"
+      } with this email already exist.`,
     });
   }
-
-  const hashedPassword = await bcrypt.hash(password, 10); //salt rounds
+  let hashedPassword;
+  if (role === "teacher") {
+    hashedPassword = await bcrypt.hash(
+      fullName.slice(0, 3) + "@" + phone.slice(6, 10),
+      10
+    ); //salt rounds
+  } else {
+    hashedPassword = await bcrypt.hash(password, 10); //salt rounds
+  }
   const userObject = {
-    ownerName,
+    fullname: ownerName,
     password: hashedPassword,
     institute: instituteName,
     email,
@@ -34,18 +78,20 @@ export const createNewUser = asyncHandler(async (req, res) => {
   };
 
   //create and store new user
-  const user = await User.create(userObject);
+  let user = await User.create(userObject);
   if (user) {
     delete user.password;
     delete user._V;
-    res.status(200).json({
+    res.status(201).json({
       statusCode: 201,
-      message: "User created successfully.",
+      message: `${
+        le === "teacher" ? "Teacher" : "Admin"
+      } created successfully.`,
       data: user,
     });
   } else {
     res
-      .status(200)
+      .status(400)
       .json({ statusCode: 400, message: "Invalid user data receives." });
   }
 });

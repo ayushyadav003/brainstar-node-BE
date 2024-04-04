@@ -16,7 +16,7 @@ const RESET_PASSWORD_TOKEN = {
 
 const user = mongoose.Schema;
 const UserSchema = new user({
-  ownerName: { type: String, required: [true, "Owner name is required"] },
+  fullName: { type: String, required: [true, "Owner name is required"] },
   email: {
     type: String,
     required: [true, "Email is required"],
@@ -37,6 +37,12 @@ const UserSchema = new user({
   role: {
     type: String,
     default: "admin",
+  },
+  classes: {
+    type: [String],
+  },
+  batches: {
+    type: [String],
   },
 });
 
