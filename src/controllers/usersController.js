@@ -1,6 +1,7 @@
 import asyncHandler from "express-async-handler";
 import bcrypt from "bcrypt";
 import { User } from "../models/User.js";
+const { v4: uuidv4 } = require("uuid");
 
 // get all user
 export const getAllUsers = asyncHandler(async (req, res) => {
@@ -72,6 +73,7 @@ export const createNewUser = asyncHandler(async (req, res) => {
     fullname: ownerName,
     password: hashedPassword,
     institute: instituteName,
+    instituteId: uuidv4(),
     email,
     phone,
     role,
