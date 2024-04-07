@@ -26,6 +26,10 @@ const UserSchema = new user({
     type: String,
     required: true,
   },
+  instituteId: {
+    type: String,
+    required: true,
+  },
   password: {
     type: String,
     required: true,
