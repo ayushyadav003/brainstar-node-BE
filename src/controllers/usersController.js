@@ -1,7 +1,7 @@
 import asyncHandler from "express-async-handler";
 import bcrypt from "bcrypt";
 import { User } from "../models/User.js";
-const { v4: uuidv4 } = require("uuid");
+import { v4 as uuidv4 } from "uuid";
 
 // get all user
 export const getAllUsers = asyncHandler(async (req, res) => {
