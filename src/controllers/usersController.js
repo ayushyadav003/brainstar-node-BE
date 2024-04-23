@@ -40,7 +40,16 @@ export const getAllUsers = asyncHandler(async (req, res) => {
 
 // Create new user
 export const createNewUser = asyncHandler(async (req, res) => {
-  const { ownerName, instituteName, password, email, phone, role } = req.body;
+  const {
+    ownerName,
+    instituteName,
+    instituteId,
+    password,
+    email,
+    phone,
+    role,
+    permissions,
+  } = req.body;
 
   //confirm data
   if (!ownerName || !instituteName || !email || !role) {
@@ -73,10 +82,11 @@ export const createNewUser = asyncHandler(async (req, res) => {
     fullname: ownerName,
     password: hashedPassword,
     institute: instituteName,
-    instituteId: uuidv4(),
+    instituteId: instituteId || uuidv4(),
     email,
     phone,
     role,
+    permissions: role === "teacher" ? permissions : [],
   };
 
   //create and store new user

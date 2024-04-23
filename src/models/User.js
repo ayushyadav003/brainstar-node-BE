@@ -24,7 +24,6 @@ const UserSchema = new user({
   },
   institute: {
     type: String,
-    required: true,
   },
   instituteId: {
     type: String,
@@ -38,15 +37,18 @@ const UserSchema = new user({
     type: Number,
     unique: true,
   },
-  role: {
-    type: String,
-    default: "admin",
-  },
   classes: {
     type: [String],
   },
   batches: {
     type: [String],
+  },
+  permissions: {
+    type: [String],
+  },
+  role: {
+    type: String,
+    default: "admin",
   },
 });
 
