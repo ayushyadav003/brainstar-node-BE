@@ -9,7 +9,7 @@ export const createMeeting = asyncHandler(async (req, res) => {
   const {
     startTime,
     topic,
-    duration,
+    // duration,
     description,
     classId,
     batchId,

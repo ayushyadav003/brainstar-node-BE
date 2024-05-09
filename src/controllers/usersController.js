@@ -5,17 +5,17 @@ import { v4 as uuidv4 } from "uuid";
 
 // get all user
 export const getAllUsers = asyncHandler(async (req, res) => {
-  const { instituteId, userId, role } = req.body;
+  const { instituteId, userId, role } = req.query;
 
   //confirm data
   if (!instituteId) {
     return res
       .status(400)
-      .json({ statusCode: 400, message: "InstituteId be provided." });
+      .json({ statusCode: 400, message: "InstituteId must be provided." });
   }
 
   let query = {
-    institute: instituteId,
+    instituteId: instituteId,
     role,
   };
 
@@ -27,8 +27,8 @@ export const getAllUsers = asyncHandler(async (req, res) => {
 
   if (users) {
     res.status(200).json({
-      statusCode: 201,
-      message: "User created successfully.",
+      statusCode: 200,
+      message: "Users found successfully.",
       data: users,
     });
   } else {
@@ -72,21 +72,21 @@ export const createNewUser = asyncHandler(async (req, res) => {
   let hashedPassword;
   if (role === "teacher") {
     hashedPassword = await bcrypt.hash(
-      fullName.slice(0, 3) + "@" + phone.slice(6, 10),
+      ownerName.slice(0, 3) + "@" + phone.slice(6, 10),
       10
     ); //salt rounds
   } else {
     hashedPassword = await bcrypt.hash(password, 10); //salt rounds
   }
   const userObject = {
-    fullname: ownerName,
+    fullName: ownerName,
     password: hashedPassword,
     institute: instituteName,
     instituteId: instituteId || uuidv4(),
     email,
     phone,
     role,
-    permissions: role === "teacher" ? permissions : [],
+    permissions: role === "teacher" ? [] : "all",
   };
 
   //create and store new user
@@ -97,7 +97,7 @@ export const createNewUser = asyncHandler(async (req, res) => {
     res.status(201).json({
       statusCode: 201,
       message: `${
-        le === "teacher" ? "Teacher" : "Admin"
+        role === "teacher" ? "Teacher" : "Admin"
       } created successfully.`,
       data: user,
     });
