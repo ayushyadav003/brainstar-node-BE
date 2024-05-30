@@ -17,16 +17,13 @@ export const login = asyncHandler(async (req, res) => {
 
   var foundUser;
 
-  switch (role) {
-    case "Student":
-      foundUser = await Student.findOne({ email }).exec();
-      break;
-    default:
-      foundUser = await User.findOne({ email }).exec();
-      if (!foundUser) {
-        foundUser = await Teacher.findOne({ email }).exec();
-      }
-      break;
+  foundUser = await Student.findOne({ email }).exec();
+
+  if (!foundUser) {
+    foundUser = await Teacher.findOne({ email }).exec();
+  }
+  if (!foundUser) {
+    foundUser = await User.findOne({ email }).exec();
   }
 
   if (!foundUser) {
