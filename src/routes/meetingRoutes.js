@@ -1,8 +1,11 @@
 import express from "express";
-import { createMeeting } from "../controllers/meetingsController.js";
+import {
+  createMeeting,
+  getAllMeetings,
+} from "../controllers/meetingsController.js";
 
 const meetingRouter = express.Router();
 
-meetingRouter.route("/").get().post(createMeeting).put().delete();
+meetingRouter.route("/").get(getAllMeetings).post(createMeeting).put().delete();
 
 export default meetingRouter;

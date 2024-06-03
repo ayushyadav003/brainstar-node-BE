@@ -5,34 +5,49 @@ import { Meeting } from "../models/meetings.js";
 let zoomToken = null;
 let tokenExpiry = 0;
 
+const durationObj = {
+  "30 min": 30,
+  "45 min": 45,
+  "1 hr": 60,
+  "2 min": 120,
+};
+
+function formatDateTime(hour, minute) {
+  const now = new Date();
+  now.setUTCHours(hour, minute, 0, 0);
+  const formattedDateTime = now.toISOString();
+  return formattedDateTime;
+}
+
 export const createMeeting = asyncHandler(async (req, res) => {
   const {
     startTime,
-    topic,
+    title,
     duration,
     description,
     classId,
-    batchId,
+    batch,
     instituteId,
   } = req.body;
   const currentTime = Math.floor(Date.now() / 1000);
 
-  if (!startTime || !endTime || !classId || !batchId || !instituteId) {
+  if (!startTime || !duration || !title || !classId || !batch || !instituteId) {
     res.status(400).json({
       statusCode: 400,
       message: `${
         !classId
-          ? "ClassId"
+          ? "Class"
           : !instituteId
           ? "InstituteId"
           : !startTime
-          ? "startTime"
-          : !endTime
-          ? "endTime"
-          : !topic && "topic"
+          ? "Staet Time"
+          : !duration
+          ? "Duration"
+          : !title && "Title"
       } is required`,
     });
   }
+  const splittedTime = startTime.split(":");
 
   try {
     if (!zoomToken || !currentTime < tokenExpiry) {
@@ -64,10 +79,10 @@ export const createMeeting = asyncHandler(async (req, res) => {
         "Content-Type": "application/json",
       },
       data: {
-        topic: topic,
+        topic: title,
         type: 2,
-        start_time: startTime,
-        duration: duration,
+        start_time: formatDateTime(splittedTime[0], splittedTime[1]),
+        duration: durationObj[duration],
         timezone: "Asia/Kolkata",
         settings: {
           join_before_host: true,
@@ -89,14 +104,14 @@ export const createMeeting = asyncHandler(async (req, res) => {
     console.log(response);
 
     const meetingObject = {
-      topic,
+      topic: title,
       zoom_meetingId: response?.id,
       description,
       join_url: response?.join_url,
       start_url: response?.start_url,
       instituteId,
       classId,
-      batchId,
+      batch,
       startTime,
       duration,
     };
@@ -105,12 +120,16 @@ export const createMeeting = asyncHandler(async (req, res) => {
     if (scheduleMeeting) {
       res.status(201).json({
         statusCode: 201,
-        message: "Meeting created successfully.",
+        data: {
+          message: "Meeting created successfully.",
+        },
       });
     } else {
-      res.status(400).json({
+      res.status(200).json({
         statusCode: 400,
-        message: "Something went wrong, Please contact support.",
+        data: {
+          message: "Something went wrong, Please contact support.",
+        },
       });
     }
   } catch (error) {
@@ -119,9 +138,9 @@ export const createMeeting = asyncHandler(async (req, res) => {
 });
 
 export const getAllMeetings = asyncHandler(async (req, res) => {
-  const { instituteId, classId, batchId, teacherId } = req.body;
+  const { instituteId, classId, batchId } = req.query;
 
-  let query = { instituteId, teacherId };
+  let query = { instituteId };
 
   if (classId) {
     query["classId"] = classId;
@@ -131,8 +150,11 @@ export const getAllMeetings = asyncHandler(async (req, res) => {
     query["batchId"] = batchId;
   }
   const meetings = await Meeting.find(query).lean();
-  if (!meetings?.length) {
-    return res.status(400).json({ message: "No student found." });
+
+  if (!meetings) {
+    return res
+      .status(200)
+      .json({ statusCode: 404, data: { message: "No Meetings found." } });
   }
 
   res.status(200).json({ statusCode: 200, meetings });
