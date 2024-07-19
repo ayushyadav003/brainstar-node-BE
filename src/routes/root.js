@@ -5,6 +5,7 @@ import meetingRouter from "./meetingRoutes.js";
 import studentRouter from "./studentsRoutes.js";
 import userRoutes from "./userRoutes.js";
 import classRouter from "./classRoutes.js";
+import notesRouter from "./notesRoutes.js";
 
 const router = express.Router();
 const path = "/api/v1";
@@ -16,6 +17,8 @@ router.use(`${path}/class`, classRouter);
 router.use(`${path}/batch`, batchRouter);
 router.use(`${path}/students`, studentRouter);
 router.use(`${path}/meetings`, meetingRouter);
+router.use(`${path}/notes`,notesRouter)
+
 
 // Export the router
 export default router;
