@@ -11,6 +11,11 @@ const teacherSchema = new teacher(
       required: [true, "Email is required"],
       unique: true,
     },
+    access: {
+      type: [],
+      default: [],
+      require: [true, "Access is neeeded"],
+    },
     phone: {
       type: Number,
       unique: true,

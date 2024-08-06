@@ -54,7 +54,7 @@ export const createNewUser = asyncHandler(async (req, res) => {
   //confirm data
   if (!ownerName || !instituteName || !email || !role) {
     return res
-      .status(200)
+      .status(400)
       .json({ statusCode: 400, message: "All fields must be provided." });
   }
 

@@ -16,6 +16,7 @@
     "axios": "^1.6.8",
     "bcrypt": "^5.1.1",
     "bcryptjs": "^2.4.3",
+    "cache": "^3.0.0",
     "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",
     "date-fns": "^3.0.6",
@@ -28,7 +29,8 @@
     "jsonwebtoken": "^9.0.2",
     "jsrsasign": "^11.1.0",
     "mongoose": "^8.0.3",
-    "nodemailer": "^6.9.7",
+    "nodemailer": "^6.9.14",
+    "otp-generator": "^4.0.1",
     "uuid": "^9.0.1",
     "zoomus": "^0.1.4"
   },
