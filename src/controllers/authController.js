@@ -174,5 +174,5 @@ export const superAdminLogin = asyncHandler(async (req, res) => {
     return res.status(404).json({ message: "Wrong password please try again" });
 
   if (isPasswordCorrect)
-    return res.status(200).json({ statusCode: 200, superAdmin });
+    return res.status(200).json({ statusCode: 200, superAdmin })
 });
