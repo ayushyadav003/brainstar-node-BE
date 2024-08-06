@@ -44,7 +44,7 @@ export const getTickets = asyncHandler(async (req, res) => {
   });
 });
 
-export const deleteTicket = asyncHandler(async (req, res) => {
+export const deleteTicket = asyncHandler(async (req, res) => {  
   const {ticketId} = req.params;
 
   const ticket = await Ticket.findOneAndDelete({_id:ticketId});
