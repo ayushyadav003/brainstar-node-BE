@@ -7,6 +7,7 @@ import { SuperAdmin } from "../models/superAdmin.js";
 import otpGenerator from "otp-generator";
 import Cache from "cache";
 import nodeMailer from "nodemailer";
+import jwt from "jsonwebtoken";
 const memoryCache = new Cache(30 * 1000);
 
 // POST /auth
@@ -136,9 +137,6 @@ export const superAdminSignup = asyncHandler(async (req, res) => {
     if (superAdmin)
       return res.status(400).json({ message: "User already exist" });
 
-    //TODO:
-    // CREATE INSTITUTE ID WITH UUD PACKAGE
-
     const salt = bcrypt.genSaltSync(10);
     const hashedPassword = bcrypt.hashSync(password, salt);
 
@@ -161,18 +159,35 @@ export const superAdminSignup = asyncHandler(async (req, res) => {
 });
 
 export const superAdminLogin = asyncHandler(async (req, res) => {
-  const { email, password } = req.body;
+  const { email, enteredPassword } = req.body;
 
   const superAdmin = await SuperAdmin.findOne({ email });
+
+  //TODO:
+  // JSON Web token
 
   if (!superAdmin)
     return res.status(404).json({ message: "User does not exist" });
 
-  const isPasswordCorrect = await bcrypt.compare(password, superAdmin.password);
+  const isPasswordCorrect = await bcrypt.compare(
+    enteredPassword,
+    superAdmin.password
+  );
 
-  if(!isPasswordCorrect)
+  if (!isPasswordCorrect)
     return res.status(404).json({ message: "Wrong password please try again" });
 
+  const accessToken = jwt.sign({ superAdmin }, process.env.JWT_SECRET, {
+    expiresIn: "45d",
+  });
+
+  const { password, ...userData } = superAdmin._doc;
+
+
+  // dekhna padega header set nhi ho rha 
   if (isPasswordCorrect)
-    return res.status(200).json({ statusCode: 200, superAdmin })
+    return res
+      .status(200)
+      .header("Authorization", accessToken)
+      .json({ statusCode: 200, userData });
 });

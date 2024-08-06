@@ -1,6 +1,4 @@
 import mongoose from "mongoose";
-import bcrypt from "bcrypt";
-import jwt from "jsonwebtoken";
 
 const teacher = mongoose.Schema;
 const teacherSchema = new teacher(
@@ -11,17 +9,13 @@ const teacherSchema = new teacher(
       required: [true, "Email is required"],
       unique: true,
     },
-    access: {
-      type: [],
-      default: [],
-      require: [true, "Access is neeeded"],
-    },
-    phone: {
+    phoneNumber: {
       type: Number,
       unique: true,
     },
     classes: {
       type: [String],
+      require: [true, "Batch is required"],
       unique: true,
     },
     batches: {
