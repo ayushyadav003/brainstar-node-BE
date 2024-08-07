@@ -13,7 +13,7 @@ const memoryCache = new Cache(30 * 1000);
 // POST /auth
 // public
 export const login = asyncHandler(async (req, res) => {
-  const { email, password, role } = req.body;
+  const { email, password } = req.body;
   if (!email || !password) {
     return res
       .status(200)
@@ -160,7 +160,8 @@ export const superAdminSignup = asyncHandler(async (req, res) => {
 
 export const superAdminLogin = asyncHandler(async (req, res) => {
   const { email, enteredPassword,loginType } = req.body;
-  const clusterName =  loginType == 'teacher' ? Teacher : SuperAdmin
+  const clusterName = loginType === 'teacher' ? Teacher : loginType === 'student' ? Student : SuperAdmin;
+
 
   const loginUser = await clusterName.findOne({ email }).lean().exec();
   console.log(loginUser)

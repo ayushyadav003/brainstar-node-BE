@@ -19,7 +19,7 @@ const teacherSchema = new teacher(
       unique: true,
     },
     classes: {
-      type: [String],
+      type: [Number],
       require: [true, "Batch is required"],
       unique: true,
     },
@@ -41,7 +41,13 @@ const teacherSchema = new teacher(
       ref:"SuperAdmin",
       require: ["Institue Id is required"],
     },
+    teacherId: {
+      type: ObjectId,
+      ref:"Teacher",
+      require: ["Teacher Id is required"],
+    },
   },
+
   {
     timestamps: true,
   }

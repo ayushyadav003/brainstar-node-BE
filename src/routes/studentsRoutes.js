@@ -1,6 +1,6 @@
 import express from "express";
 import {
-  craeteNewStudent,
+  createNewStudent,
   deleteStudent,
   getAllStudents,
   getStudent,
@@ -9,12 +9,7 @@ import {
 
 const studentRouter = express.Router();
 
-studentRouter
-  .route("/")
-  .get(getAllStudents)
-  .post(craeteNewStudent)
-  .put()
-  .delete(deleteStudent);
+studentRouter.route("/createStudent").post(createNewStudent);
 
 studentRouter.route("/attendance").post(updateAttendance);
 export default studentRouter;
