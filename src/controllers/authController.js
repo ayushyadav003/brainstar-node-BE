@@ -159,29 +159,30 @@ export const superAdminSignup = asyncHandler(async (req, res) => {
 });
 
 export const superAdminLogin = asyncHandler(async (req, res) => {
-  const { email, enteredPassword } = req.body;
+  const { email, enteredPassword,loginType } = req.body;
+  const clusterName =  loginType == 'teacher' ? Teacher : SuperAdmin
 
-  const superAdmin = await SuperAdmin.findOne({ email });
-
+  const loginUser = await clusterName.findOne({ email }).lean().exec();
+  console.log(loginUser)
   //TODO:
   // JSON Web token
 
-  if (!superAdmin)
+  if (!loginUser)
     return res.status(404).json({ message: "User does not exist" });
 
   const isPasswordCorrect = await bcrypt.compare(
     enteredPassword,
-    superAdmin.password
+    loginUser.password
   );
 
   if (!isPasswordCorrect)
     return res.status(404).json({ message: "Wrong password please try again" });
 
-  const accessToken = jwt.sign({ superAdmin }, process.env.JWT_SECRET, {
+  const accessToken = jwt.sign({ loginUser }, process.env.JWT_SECRET, {
     expiresIn: "45d",
   });
 
-  const { password, ...userData } = superAdmin._doc;
+  // const { password, ...userData } = loginUser._doc;
 
 
   // dekhna padega header set nhi ho rha 
@@ -189,5 +190,5 @@ export const superAdminLogin = asyncHandler(async (req, res) => {
     return res
       .status(200)
       .header("Authorization", accessToken)
-      .json({ statusCode: 200, userData });
+      .json({ statusCode: 200, loginUser });
 });

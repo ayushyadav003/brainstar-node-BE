@@ -1,7 +1,9 @@
 import asyncHandler from "express-async-handler";
-import bcrypt from "bcrypt";
 import { Student } from "../models/student.js";
-import { User } from "../models/User.js";
+import nodeMailer from "nodemailer";
+import { Teacher } from "../models/teacher.js";
+import bcrypt from "bcrypt";
+import { v4 as uuidv4 } from 'uuid';
 
 // Get all students
 export const getAllTeachers = asyncHandler(async (req, res) => {
@@ -37,42 +39,69 @@ export const getStudent = asyncHandler(async (req, res) => {
 });
 
 // Create new student
-export const craeteNewTeacher = asyncHandler(async (req, res) => {
-  const { fullName, email, phone, batches, classes, institute } = req.body;
+export const createNewTeacher = asyncHandler(async (req, res) => {
+  const { fullName, email, phoneNumber, batches, classes, instituteId } =
+    req.body;
 
-  if (!fullName || !email || !batches || !classes || !fee || !teacherId) {
+  if (!fullName || !email || !batches || !classes || !instituteId || !phoneNumber ) {
     return res.status(400).json({ message: "All fields must be provided." });
   }
 
-  const duplicate = await Student.findOne({ email }).lean().exec();
+  const duplicate = await Teacher.findOne({ email }).lean().exec();
 
   if (duplicate) {
     return res
       .status(409)
-      .json({ message: "Student with this email already exist." });
+      .json({ message: "Teacher with this email already exist." });
   }
 
-  const hashedPassword = await bcrypt.hash(email.slice(0, 4) + "@" + 325, 10); //salt rounds
-  const studentObject = {
+  const password = uuidv4();
+  const salt = bcrypt.genSaltSync(10);
+  const hashedPassword = bcrypt.hashSync(password, salt);
+  
+  const teacherObj = {
     fullName,
     classes,
     batches,
     email,
-    phone,
-    role: "Student",
-    fee,
-    institute,
-    teacherId,
-    password: hashedPassword,
+    phoneNumber,
+    instituteId,
+    password:hashedPassword,
   };
 
-  const student = await Student.create(studentObject);
+  const transporter = nodeMailer.createTransport({
+    service: "gmail",
+    host: "smtp.gmail.com",
+    port: 587,
+    secure: false,
+    auth: {
+      user: "rs20021023@gmail.com",
+      pass: "sjpg crnj kpto xgoq",
+    },
+  });
 
-  if (student) {
+  const mailOptions = {
+    from: {
+      name: "Brainster",
+      address: "rs20021023@gmail.com",
+    },
+    to: email,
+    subject: "Teacher registered",
+    html: `
+    <p>Congratulations you have been registered as a teacher</p>
+    <p>password-${password}
+    <p>Ignore this mail if you haven't tried to register on Brainster</p>`,
+  };
+
+    await transporter.sendMail(mailOptions);
+
+  const teacher = await Teacher.create(teacherObj);
+
+  if (teacher) {
     res.status(201).json({
       statusCode: 201,
-      message: "Student created successfully and password sent to their email.",
-      data: student,
+      message: "Teacher created successfully password is sent to mail",
+      data: teacher,
     });
   } else {
     res
@@ -81,84 +110,3 @@ export const craeteNewTeacher = asyncHandler(async (req, res) => {
   }
 });
 
-// update student
-export const updateStudent = asyncHandler(async (req, res) => {
-  const { fullName, email, role, password } = req.body;
-
-  const student = await Student.findOne({ email }).exec();
-
-  if (!student) {
-    res.send(400).json({ message: "No student found with this email." });
-  }
-  const duplicate = await User.findOne({ email }).lean().exec();
-
-  if (duplicate && duplicate.email.toString() !== email) {
-    return res
-      .status(400)
-      .json({ message: "User already exist with this email." });
-  }
-
-  student.fullName = fullName;
-  student.email = newEmail;
-
-  const upadtesUser = await student.save();
-
-  res.json({ message: `${fullName} updates successfully.`, data: upadtesUser });
-});
-
-//update attendance
-export const updateAttendance = asyncHandler(async (req, res) => {
-  const { studenId, date, batch } = req.body;
-
-  let student = await Student.findOne({ _id: studenId }).exec();
-
-  if (!student) {
-    res.status(400).json({ message: "No student" });
-  }
-  const existingAttendance = student?.attendance?.find(
-    (item) => item.date === date
-  );
-
-  if (existingAttendance) {
-    const existingBatch = existingAttendance?.batch?.find(
-      (item) => item.batchId === batch.batchId
-    );
-
-    if (existingBatch) {
-      existingBatch.status = batch.status;
-    } else {
-      batch.push({ batchId: batch.batchId, status: batch.status });
-    }
-  } else {
-    student.attendance.push({
-      date,
-      batch: [{ batchId: batch.batchId, status: batch.status }],
-    });
-  }
-
-  await student.save();
-
-  res.json({ message: `Attendance updates successfully.` });
-});
-
-// delete student
-export const deleteStudent = asyncHandler(async (req, res) => {
-  const { studentId } = req.body;
-
-  const user = await Student.findOne({ _id: studentId }).lean().exec();
-
-  if (!user) {
-    res.status(400).json({ message: "User not found." });
-  }
-
-  const result = await Student.deleteOne();
-
-  const reply = `${result.fullName} deleted successfully.`;
-
-  console.log(reply);
-
-  res.status(200).json({
-    statusCode: 200,
-    message: reply,
-  });
-});

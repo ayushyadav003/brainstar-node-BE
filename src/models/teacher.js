@@ -1,5 +1,10 @@
 import mongoose from "mongoose";
 
+
+
+const { Types } = mongoose;
+const { ObjectId } = Types;
+
 const teacher = mongoose.Schema;
 const teacherSchema = new teacher(
   {
@@ -21,6 +26,20 @@ const teacherSchema = new teacher(
     batches: {
       type: [String],
       require: [true, "Batch is required."],
+    },
+    role: {
+      type: String,
+      required: ["Role is required"],
+      default: "teacher",
+    },
+    password:{
+      type:String,
+      required: ["Pasword is required"],
+    },
+    instituteId: {
+      type: ObjectId,
+      ref:"SuperAdmin",
+      require: ["Institue Id is required"],
     },
   },
   {
