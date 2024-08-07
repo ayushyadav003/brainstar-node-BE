@@ -1,6 +1,6 @@
 import express from "express";
-import { loginLimitter } from "../middlewares/logiinLimiter.js";
 import {
+  forgotPassword,
   login,
   sendOtp,
   superAdminLogin,
@@ -13,5 +13,6 @@ authRouter.route("/").post(login);
 authRouter.route("/signup").post(superAdminSignup);
 authRouter.route("/login").post(superAdminLogin);
 authRouter.route("/sendOtp").post(sendOtp);
+authRouter.route("/forgotPassword").post(forgotPassword);
 
 export default authRouter;

@@ -80,8 +80,6 @@ export const sendOtp = async (req, res) => {
 
   const user = await SuperAdmin.findOne({ email });
 
-  if (user) return res.status(400).json("User already exist");
-
   const generatedOtp = otpGenerator.generate(4, {
     lowerCaseAlphabets: false,
     upperCaseAlphabets: false,
@@ -159,12 +157,16 @@ export const superAdminSignup = asyncHandler(async (req, res) => {
 });
 
 export const superAdminLogin = asyncHandler(async (req, res) => {
-  const { email, enteredPassword,loginType } = req.body;
-  const clusterName = loginType === 'teacher' ? Teacher : loginType === 'student' ? Student : SuperAdmin;
-
+  const { email, enteredPassword, loginType } = req.body;
+  const clusterName =
+    loginType === "teacher"
+      ? Teacher
+      : loginType === "student"
+      ? Student
+      : SuperAdmin;
 
   const loginUser = await clusterName.findOne({ email }).lean().exec();
-  console.log(loginUser)
+  console.log(loginUser);
   //TODO:
   // JSON Web token
 
@@ -185,11 +187,30 @@ export const superAdminLogin = asyncHandler(async (req, res) => {
 
   // const { password, ...userData } = loginUser._doc;
 
-
-  // dekhna padega header set nhi ho rha 
+  // dekhna padega header set nhi ho rha
   if (isPasswordCorrect)
     return res
       .status(200)
       .header("Authorization", accessToken)
       .json({ statusCode: 200, loginUser });
+});
+
+export const forgotPassword = asyncHandler(async (req, res) => {
+  const generatedOtp = parseInt(memoryCache.get("generatedOtp"));
+  const { userOtp, email, newPassword, roleType } = req.body;
+  if (userOtp === generatedOtp) {
+    const clusterName =
+      roleType === "teacher"
+        ? Teacher
+        : roleType === "student"
+        ? Student
+        : SuperAdmin;
+    const salt = bcrypt.genSaltSync(10);
+    const hashedPassword = bcrypt.hashSync(newPassword, salt);
+    await clusterName.findOneAndUpdate({ email }, { password: hashedPassword });
+
+    return res.status(200).json({ message: "Password updated successfully" });
+  } else {
+    return res.status(401).json({ message: "Wrong otp entered" });
+  }
 });
