@@ -24,7 +24,7 @@ const superAdminSchema = new superAdmin(
       type: Number,
       required: [true, "Email is required"],
     },
-    Role: {
+    role: {
       type: "String",
       required: ["Role is required"],
       default: "superAdmin",

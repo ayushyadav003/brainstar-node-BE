@@ -7,12 +7,13 @@ import { SuperAdmin } from "../models/superAdmin.js";
 import otpGenerator from "otp-generator";
 import Cache from "cache";
 import nodeMailer from "nodemailer";
+import jwt from "jsonwebtoken";
 const memoryCache = new Cache(30 * 1000);
 
 // POST /auth
 // public
 export const login = asyncHandler(async (req, res) => {
-  const { email, password, role } = req.body;
+  const { email, password } = req.body;
   if (!email || !password) {
     return res
       .status(200)
@@ -79,8 +80,6 @@ export const sendOtp = async (req, res) => {
 
   const user = await SuperAdmin.findOne({ email });
 
-  if (user) return res.status(400).json("User already exist");
-
   const generatedOtp = otpGenerator.generate(4, {
     lowerCaseAlphabets: false,
     upperCaseAlphabets: false,
@@ -136,9 +135,6 @@ export const superAdminSignup = asyncHandler(async (req, res) => {
     if (superAdmin)
       return res.status(400).json({ message: "User already exist" });
 
-    //TODO:
-    // CREATE INSTITUTE ID WITH UUD PACKAGE
-
     const salt = bcrypt.genSaltSync(10);
     const hashedPassword = bcrypt.hashSync(password, salt);
 
@@ -161,18 +157,60 @@ export const superAdminSignup = asyncHandler(async (req, res) => {
 });
 
 export const superAdminLogin = asyncHandler(async (req, res) => {
-  const { email, password } = req.body;
+  const { email, enteredPassword, loginType } = req.body;
+  const clusterName =
+    loginType === "teacher"
+      ? Teacher
+      : loginType === "student"
+      ? Student
+      : SuperAdmin;
 
-  const superAdmin = await SuperAdmin.findOne({ email });
+  const loginUser = await clusterName.findOne({ email }).lean().exec();
+  console.log(loginUser);
+  //TODO:
+  // JSON Web token
 
-  if (!superAdmin)
+  if (!loginUser)
     return res.status(404).json({ message: "User does not exist" });
 
-  const isPasswordCorrect = await bcrypt.compare(password, superAdmin.password);
+  const isPasswordCorrect = await bcrypt.compare(
+    enteredPassword,
+    loginUser.password
+  );
 
-  if(!isPasswordCorrect)
+  if (!isPasswordCorrect)
     return res.status(404).json({ message: "Wrong password please try again" });
 
+  const accessToken = jwt.sign({ loginUser }, process.env.JWT_SECRET, {
+    expiresIn: "45d",
+  });
+
+  // const { password, ...userData } = loginUser._doc;
+
+  // dekhna padega header set nhi ho rha
   if (isPasswordCorrect)
-    return res.status(200).json({ statusCode: 200, superAdmin })
+    return res
+      .status(200)
+      .header("Authorization", accessToken)
+      .json({ statusCode: 200, loginUser });
+});
+
+export const forgotPassword = asyncHandler(async (req, res) => {
+  const generatedOtp = parseInt(memoryCache.get("generatedOtp"));
+  const { userOtp, email, newPassword, roleType } = req.body;
+  if (userOtp === generatedOtp) {
+    const clusterName =
+      roleType === "teacher"
+        ? Teacher
+        : roleType === "student"
+        ? Student
+        : SuperAdmin;
+    const salt = bcrypt.genSaltSync(10);
+    const hashedPassword = bcrypt.hashSync(newPassword, salt);
+    await clusterName.findOneAndUpdate({ email }, { password: hashedPassword });
+
+    return res.status(200).json({ message: "Password updated successfully" });
+  } else {
+    return res.status(401).json({ message: "Wrong otp entered" });
+  }
 });

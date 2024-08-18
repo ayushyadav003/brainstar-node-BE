@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
-import bcrypt from "bcrypt";
-import jwt from "jsonwebtoken";
 
+const { Types } = mongoose;
+const { ObjectId } = Types;
 const student = mongoose.Schema;
 const studentSchema = new student(
   {
@@ -11,40 +11,42 @@ const studentSchema = new student(
       required: [true, "Email is required"],
       unique: true,
     },
-    phone: {
+    phoneNumber: {
       type: Number,
       unique: true,
     },
-    teacherId: {
-      type: String,
-      required: true,
-      // title: { type: String, required: true },
-    },
-    classes: {
-      id: { type: String, required: true },
-      title: { type: String, required: true },
-    },
-    batches: [
-      {
-        id: { type: String, required: true },
-        title: { type: String, required: true },
-      },
-    ],
-    fee: {
+    studentClass: {
       type: Number,
+      require: [true, "Class is required"],
+      unique: true,
     },
-    attendance: [
-      {
-        date: { type: String },
-        batch: [{ batchId: String, status: String }],
-      },
-    ],
-
+    batches: {
+      type: [String],
+      require: [true, "Batch is required."],
+    },
+    role: {
+      type: String,
+      required: ["Role is required"],
+      default: "student",
+    },
     password: {
       type: String,
-      require: true,
+      required: ["Pasword is required"],
     },
-    institute: { type: String, require: true },
+    instituteId: {
+      type: ObjectId,
+      ref: "SuperAdmin",
+      require: ["Institue Id is required"],
+    },
+    teacherId: {
+      type: ObjectId,
+      ref: "Teacher",
+      require: ["Institue Id is required"],
+    },
+    fee: {
+      type: Number,
+      require: ["Fee is required"],
+    },
   },
   {
     timestamps: true,

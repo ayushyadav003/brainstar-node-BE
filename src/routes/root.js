@@ -8,6 +8,7 @@ import classRouter from "./classRoutes.js";
 import notesRouter from "./notesRoutes.js";
 import ticketRouter from "./ticketRoutes.js";
 import websiteRouter from "./webSiteRoutes.js";
+import teacherRouter from "./teacherRoutes.js";
 
 const router = express.Router();
 const path = "/api/v1";
@@ -22,6 +23,7 @@ router.use(`${path}/meetings`, meetingRouter);
 router.use(`${path}/notes`, notesRouter);
 router.use(`${path}/tickets`, ticketRouter);
 router.use(`${path}/website`,websiteRouter)
+router.use(`${path}/teacher`,teacherRouter)
 
 // Export the router
 export default router;
