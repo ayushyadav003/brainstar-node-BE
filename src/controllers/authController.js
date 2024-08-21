@@ -125,16 +125,17 @@ export const superAdminSignup = asyncHandler(async (req, res) => {
   const { userOtp, email, password, phoneNumber, instituteName, fullName } =
     req.body;
 
-  if (!generatedOtp)
-    return res
-      .status(500)
-      .json({ message: "Otp expired please generated a new Otp" });
-  if (userOtp === generatedOtp) {
+  // if (!generatedOtp)
+  //   return res
+  //     .status(500)
+  //     .json({ message: "Otp expired please generated a new Otp" });
+
+  // if (userOtp === generatedOtp) {
+  if (email) {
     const superAdmin = await SuperAdmin.findOne({ email });
 
     if (superAdmin)
       return res.status(400).json({ message: "User already exist" });
-
     const salt = bcrypt.genSaltSync(10);
     const hashedPassword = bcrypt.hashSync(password, salt);
 
