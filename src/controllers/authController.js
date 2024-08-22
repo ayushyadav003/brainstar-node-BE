@@ -120,41 +120,38 @@ export const sendOtp = async (req, res) => {
 };
 
 export const superAdminSignup = asyncHandler(async (req, res) => {
-  const generatedOtp = memoryCache.get("generatedOtp");
+  const { email, password, phoneNumber, instituteName, fullName } = req.body;
 
-  const { userOtp, email, password, phoneNumber, instituteName, fullName } =
-    req.body;
+  const existingUser = await SuperAdmin.findOne({
+    $or: [{ email }, { phoneNumber }],
+  });
 
-  // if (!generatedOtp)
-  //   return res
-  //     .status(500)
-  //     .json({ message: "Otp expired please generated a new Otp" });
-
-  // if (userOtp === generatedOtp) {
-  if (email) {
-    const superAdmin = await SuperAdmin.findOne({ email });
-
-    if (superAdmin)
-      return res.status(400).json({ message: "User already exist" });
-    const salt = bcrypt.genSaltSync(10);
-    const hashedPassword = bcrypt.hashSync(password, salt);
-
-    const newSuperAdmin = await SuperAdmin.create({
-      fullName,
-      email,
-      password: hashedPassword,
-      phoneNumber,
-      instituteName,
-    });
-
-    return res.status(201).json({
-      statusCode: 201,
-      message: "Institute created",
-      data: newSuperAdmin,
-    });
-  } else {
-    res.status(401).json({ message: "Wrong otp entered" });
+  if (existingUser) {
+    const conflictField =
+      existingUser.email === email ? "email" : "phone number";
+    return res
+      .status(400)
+      .json({ message: `User with this ${conflictField} already exist` });
   }
+
+  // Hash the password
+  const salt = bcrypt.genSaltSync(10);
+  const hashedPassword = bcrypt.hashSync(password, salt);
+
+  // Create the new super admin
+  const newSuperAdmin = await SuperAdmin.create({
+    fullName,
+    email,
+    password: hashedPassword,
+    phoneNumber,
+    instituteName,
+  });
+
+  return res.status(201).json({
+    statusCode: 201,
+    message: "Institute created",
+    data: newSuperAdmin,
+  });
 });
 
 export const superAdminLogin = asyncHandler(async (req, res) => {
