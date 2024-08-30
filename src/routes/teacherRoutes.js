@@ -1,9 +1,18 @@
 import express from "express";
-import { createNewTeacher } from "../controllers/teacherController.js";
+import {
+  createNewTeacher,
+  deleteTeacher,
+  getAllTeachers,
+  updateTeacher,
+} from "../controllers/teacherController.js";
 
 const teacherRouter = express.Router();
 
-teacherRouter.route("/createTeacher").post(createNewTeacher)
-
+teacherRouter
+  .route("/")
+  .get(getAllTeachers)
+  .post(createNewTeacher)
+  .put(updateTeacher)
+  .delete(deleteTeacher);
 
 export default teacherRouter;
